@@ -27,7 +27,7 @@
 
 ## Ипользование модуля
 ```python
-from AioZohoAPI_SDP import Request
+from ZohoSDPlusAPI import Request
 
 sd_conn = Request('TokenKey', 'https://exemple.sd.ru/api/v3')
 
