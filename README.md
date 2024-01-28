@@ -1,4 +1,3 @@
-# ZohoAPI_SDP
 ## Общие сведения
 
 Этот модуль умеет работать с REST API Zoho SD Plus Manageengine через модуль requests
