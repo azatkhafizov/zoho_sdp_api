@@ -1,5 +1,6 @@
 import os
 
+
 from .sdp_api_core import SDP
 
 class Request(SDP):
@@ -336,7 +337,7 @@ class Request(SDP):
         attachments = list()
         if attachments_paths:
             for attachment_path in attachments_paths:
-                send_file_res = self.send_note_file_for_request(request_id, attachment_path)
+                send_file_res = self.send_file(attachment_path, f'requests/{request_id}/notes/upload')
                 if 'attachment' in send_file_res.keys():
                     attachments.append({'id': str(send_file_res['attachment']['id'])})
         input_data = {"note":{"description": message,
@@ -450,12 +451,13 @@ class Request(SDP):
             file.write(content_data)
         return {"saved_in": saved_file_patch}
 
-    def add_request_notification(self, request_id, message, attachments_paths: list = None):
+    def add_request_notification(self, request_id, description, attachments_paths: list = None):
         '''
         Эта операция позволяет добавить уведомление по заявке.
          С attachments_paths аботает, уведомление приходит на почту, в SDP не отображается, нужно разобраться
         '''
-        input_data = {"notification":{"description":message,
+        request_data = self.get_request_data(request_id)
+        input_data = {"notification":{"description":description,
                                       "subject":f"Re: [Request ID :##RE-{request_id}##] : {request_data['request']['subject']}",
                                       "content_type":"text/html",
                                       "type":"reply",
@@ -464,14 +466,13 @@ class Request(SDP):
                                       "cc":[],
                                       "bcc":[],
                                       "copied_from":{"module":"request","id":str(request_id)}}}
-        request_data = self.get_request_data(request_id)
         attachments = list()
         if attachments_paths:
-            input_data["attachments"] = attachments
             for attachment_path in attachments_paths:
                 send_file_res = self.add_notification_attachment_for_request(request_id, attachment_path)
                 if 'attachment' in send_file_res.keys():
                     attachments.append({'id': str(send_file_res['attachment']['id'])})
+        input_data["notification"]["attachments"] = attachments
         return self.post_data(f'requests/{request_id}/notifications', input_data)
 
     def get_request_template_data(self, template_id):
